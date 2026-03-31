@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ヨガの言葉</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ヨガの言葉">
+  <meta name="theme-color" content="#7aad8c">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #d4e8d4 0%, #e8e0d0 50%, #c8dce8 100%);
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* floating leaves */
+    .leaf {
+      position: fixed;
+      font-size: 1.2rem;
+      opacity: 0.35;
+      animation: drift linear infinite;
+      pointer-events: none;
+    }
+    @keyframes drift {
+      0%   { transform: translateY(110vh) rotate(0deg) translateX(0); opacity: 0; }
+      10%  { opacity: 0.35; }
+      90%  { opacity: 0.35; }
+      100% { transform: translateY(-10vh) rotate(720deg) translateX(30px); opacity: 0; }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .header h1 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.4rem;
+      color: #4a6741;
+      letter-spacing: 0.1em;
+    }
+    .header p {
+      font-size: 0.8rem;
+      color: #8aaa7a;
+      margin-top: 0.25rem;
+    }
+
+    /* category filter */
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .filter-btn {
+      background: rgba(255,255,255,0.55);
+      border: 1.5px solid #b5ccb0;
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.78rem;
+      color: #5a7852;
+      cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif;
+      transition: all 0.2s;
+    }
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: #7aad8c;
+      border-color: #7aad8c;
+      color: #fff;
+    }
+
+    /* main card */
+    .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(14px);
+      border-radius: 1.8rem;
+      padding: 2.4rem 2rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 8px 40px rgba(80,120,80,0.13);
+      transition: transform 0.3s ease;
+    }
+    .card:hover { transform: translateY(-3px); }
+
+    .category-tag {
+      display: inline-block;
+      background: #e8f5ec;
+      color: #5a8f6a;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.75rem;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    .sanskrit {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.95rem;
+      color: #9aaa8a;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.25rem;
+      min-height: 1.3rem;
+      transition: opacity 0.35s;
+    }
+
+    .word-ja {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #3a5c3a;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+      min-height: 2.6rem;
+      transition: opacity 0.35s;
+    }
+
+    .divider {
+      width: 2.5rem;
+      height: 2px;
+      background: linear-gradient(90deg, #7aad8c, #c8dce8);
+      border-radius: 1px;
+      margin-bottom: 1rem;
+    }
+
+    .meaning {
+      font-size: 0.95rem;
+      color: #5a6a55;
+      line-height: 1.85;
+      min-height: 5.5rem;
+      transition: opacity 0.35s;
+    }
+
+    .progress {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      font-size: 0.78rem;
+      color: #aac0a0;
+    }
+    .progress-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #d0dfc8;
+      transition: background 0.3s;
+    }
+    .dot.active { background: #7aad8c; }
+
+    .btn-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.6rem;
+    }
+    .btn-next {
+      flex: 1;
+      background: linear-gradient(135deg, #7aad8c, #5a9a78);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 0.85rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(90,154,120,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+    .btn-next:hover  { transform: scale(1.04); box-shadow: 0 6px 24px rgba(90,154,120,0.45); }
+    .btn-next:active { transform: scale(0.97); }
+
+    .btn-fav {
+      background: rgba(255,255,255,0.7);
+      border: 1.5px solid #c5d8bc;
+      border-radius: 999px;
+      padding: 0.85rem 1.1rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-fav:hover { background: #fff5e0; border-color: #f5c06a; }
+    .btn-fav.starred { background: #fff5e0; border-color: #f5a623; }
+
+    /* favourites panel */
+    .fav-panel {
+      position: relative;
+      z-index: 1;
+      margin-top: 1rem;
+      max-width: 480px;
+      width: 100%;
+    }
+    .fav-toggle {
+      background: none;
+      border: none;
+      color: #8aaa7a;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'Noto Sans JP', sans-serif;
+      padding: 0.3rem 0;
+      text-decoration: underline dotted;
+    }
+    .fav-list {
+      display: none;
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(10px);
+      border-radius: 1.2rem;
+      padding: 1rem 1.2rem;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #4a6741;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    .fav-list.open { display: block; }
+    .fav-item {
+      padding: 0.3rem 0;
+      border-bottom: 1px solid #e0ead8;
+    }
+    .fav-item:last-child { border-bottom: none; }
+    .fav-empty { color: #b0c8a8; font-size: 0.82rem; }
+
+    .fade-out { opacity: 0 !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌿 ヨガの言葉</h1>
+  <p>一語一語、深く知ろう</p>
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-cat="すべて" onclick="setFilter('すべて', this)">すべて</button>
+  <button class="filter-btn" data-cat="ポーズ" onclick="setFilter('ポーズ', this)">🧘 ポーズ</button>
+  <button class="filter-btn" data-cat="呼吸・エネルギー" onclick="setFilter('呼吸・エネルギー', this)">🌬 呼吸</button>
+  <button class="filter-btn" data-cat="哲学・心" onclick="setFilter('哲学・心', this)">☯ 哲学</button>
+</div>
+
+<div class="card">
+  <span class="category-tag" id="tag">ポーズ</span>
+  <div class="sanskrit" id="sanskrit">Āsana</div>
+  <div class="word-ja" id="word">アーサナ</div>
+  <div class="divider"></div>
+  <div class="meaning" id="meaning">読み込み中…</div>
+  <div class="progress">
+    <span id="count-label">1 / 20</span>
+    <div class="progress-dots" id="dots"></div>
+  </div>
+  <div class="btn-row">
+    <button class="btn-fav" id="fav-btn" onclick="toggleFav()" title="お気に入り">☆</button>
+    <button class="btn-next" onclick="nextWord()">次の言葉へ　→</button>
+  </div>
+</div>
+
+<div class="fav-panel">
+  <button class="fav-toggle" onclick="toggleFavPanel()">⭐ お気に入りリスト</button>
+  <div class="fav-list" id="fav-list"><span class="fav-empty">まだありません</span></div>
+</div>
+
+<div id="leaves"></div>
+
+<script>
+const words = [
+  // ポーズ
+  { sanskrit: "Āsana", ja: "アーサナ", cat: "ポーズ",
+    meaning: "サンスクリット語で「座る姿勢」を意味し、ヨガのポーズ全般を指す言葉です。身体を安定させながら快適に保つことで、内側への気づきが深まります。" },
+  { sanskrit: "Tāḍāsana", ja: "タダーサナ", cat: "ポーズ",
+    meaning: "「山のポーズ」。両足を揃えてまっすぐに立ち、大地に根ざした山のような安定感を体現します。すべてのポーズの基本となる立ち姿勢です。" },
+  { sanskrit: "Śavāsana", ja: "シャヴァーサナ", cat: "ポーズ",
+    meaning: "「屍のポーズ」とも呼ばれ、仰向けで完全に脱力する休息のポーズです。練習の締めくくりに行い、身体と心をリセットします。" },
+  { sanskrit: "Adho Mukha Śvānāsana", ja: "アドームカシュヴァーナーサナ", cat: "ポーズ",
+    meaning: "「下向きの犬のポーズ」。四つん這いから腰を高く上げ、逆V字型になるポーズです。全身を伸ばしエネルギーを活性化させます。" },
+  { sanskrit: "Vṛkṣāsana", ja: "ヴリクシャーサナ", cat: "ポーズ",
+    meaning: "「木のポーズ」。片足で立ち、もう一方の足を内腿に当てて木が根を張るようにバランスをとります。集中力と安定感を養います。" },
+  { sanskrit: "Balāsana", ja: "バーラーサナ", cat: "ポーズ",
+    meaning: "「子どものポーズ」。正座から前屈し額を床につける休息ポーズです。穏やかに背中を伸ばし、安心感と内省をもたらします。" },
+  { sanskrit: "Uttānāsana", ja: "ウッタナーサナ", cat: "ポーズ",
+    meaning: "「強い前屈のポーズ」。立位から上半身を深く前に倒します。ハムストリングスを伸ばしながら、神経系を落ち着かせる効果があります。" },
+
+  // 呼吸・エネルギー
+  { sanskrit: "Prāṇāyāma", ja: "プラーナーヤーマ", cat: "呼吸・エネルギー",
+    meaning: "「呼吸のコントロール」を意味します。意識的に息を調整することで、体内のエネルギー（プラーナ）を整え、心を静める実践です。" },
+  { sanskrit: "Prāṇa", ja: "プラーナ", cat: "呼吸・エネルギー",
+    meaning: "「生命エネルギー」または「生気」を意味します。すべての生き物に宿る宇宙的エネルギーであり、呼吸を通じて体内に取り込まれると考えられています。" },
+  { sanskrit: "Bandha", ja: "バンダ", cat: "呼吸・エネルギー",
+    meaning: "「結ぶ・封印する」という意味で、特定の筋肉を締めることでエネルギーの流れを制御する技法です。ムーラバンダ、ウディヤーナバンダなど複数あります。" },
+  { sanskrit: "Nāḍī", ja: "ナーディ", cat: "呼吸・エネルギー",
+    meaning: "体内のエネルギーが流れる「経路・脈管」のこと。ヨガの理論では7万2千本のナーディが存在し、そのうちスシュムナー、イダー、ピンガラーが主要とされます。" },
+  { sanskrit: "Ujjāyī", ja: "ウジャーイー", cat: "呼吸・エネルギー",
+    meaning: "「勝利の呼吸」とも呼ばれる呼吸法。喉を少し締めて息を通すことで、海の波のような音が生まれます。集中力を高め、動きと呼吸を同調させます。" },
+
+  // 哲学・心
+  { sanskrit: "Ahiṃsā", ja: "アヒンサー", cat: "哲学・心",
+    meaning: "「不傷・非暴力」を意味するヨガ哲学の根幹となる概念です。自分自身や他者、すべての生き物を傷つけないという生き方の指針です。" },
+  { sanskrit: "Dhyāna", ja: "ディヤーナ", cat: "哲学・心",
+    meaning: "「瞑想」を意味します。一点に意識を向け続け、思考の流れが静まった状態を指します。ヨガの8支則における第7段階にあたります。" },
+  { sanskrit: "Samādhi", ja: "サマーディ", cat: "哲学・心",
+    meaning: "「三昧・完全な統合」の境地。自己と対象の区別が溶け、純粋な意識だけが残る状態です。ヨガの究極の目標とされています。" },
+  { sanskrit: "Dharma", ja: "ダルマ", cat: "哲学・心",
+    meaning: "「法・義務・本来の道」を意味します。自分に与えられた役割や使命を誠実に果たすことで、宇宙の秩序と調和するという考え方です。" },
+  { sanskrit: "Dṛṣṭi", ja: "ドリシュティ", cat: "哲学・心",
+    meaning: "「視点・凝視点」を意味します。ポーズ中に目を向ける特定の場所のことで、集中力を高め心を散漫にさせないための技法です。" },
+  { sanskrit: "Sattva", ja: "サットヴァ", cat: "哲学・心",
+    meaning: "ヨガ哲学における三つの性質（グナ）のひとつで、「純粋・調和・明晰さ」を象徴します。バランスのとれた穏やかな心の状態を表します。" },
+  { sanskrit: "Mudrā", ja: "ムドラー", cat: "呼吸・エネルギー",
+    meaning: "「印・象徴的な身振り」を意味します。手や身体の特定のかたちで、エネルギーの流れを特定の方向に導く実践です。アンジャリムドラー（合掌）が代表的です。" },
+  { sanskrit: "Namaste", ja: "ナマステ", cat: "哲学・心",
+    meaning: "「あなたの中の神聖なるものに礼拝します」という意味の挨拶。ヨガクラスの始まりと終わりに使われ、互いへの敬意と感謝を表します。" },
+
+  // ポーズ（追加）
+  { sanskrit: "Vīrabhadrāsana I", ja: "ヴィーラバドラーサナI", cat: "ポーズ",
+    meaning: "「戦士のポーズI」。前足を深く曲げ、両腕を天に伸ばす力強いポーズです。内なる勇気と意志力を呼び起こします。" },
+  { sanskrit: "Vīrabhadrāsana II", ja: "ヴィーラバドラーサナII", cat: "ポーズ",
+    meaning: "「戦士のポーズII」。両腕を地面と平行に広げ、視線を前方に向けます。安定感と力強さ、開放感を同時に体験できるポーズです。" },
+  { sanskrit: "Trikoṇāsana", ja: "トリコナーサナ", cat: "ポーズ",
+    meaning: "「三角のポーズ」。足を広げて横に体を倒し、三角形の形を作ります。体の側面を深く伸ばし、バランス感覚を養います。" },
+  { sanskrit: "Paścimottānāsana", ja: "パシュチモッターナーサナ", cat: "ポーズ",
+    meaning: "「背面の強い前屈」。座位で両脚を伸ばし上体を前に倒します。背骨全体と太もも裏を伸ばし、神経系を深く落ち着かせます。" },
+  { sanskrit: "Bhujaṅgāsana", ja: "ブジャンガーサナ", cat: "ポーズ",
+    meaning: "「コブラのポーズ」。うつ伏せから上体を反らすポーズです。背骨を柔軟にし、胸を開いて呼吸を深めます。" },
+  { sanskrit: "Setu Bandha Sarvāṅgāsana", ja: "セートゥバンダサルヴァーンガーサナ", cat: "ポーズ",
+    meaning: "「橋のポーズ」。仰向けで腰を持ち上げる後屈ポーズです。脊柱を強化し、胸と肩を開いて心を活性化させます。" },
+  { sanskrit: "Ardha Candrāsana", ja: "アルダチャンドラーサナ", cat: "ポーズ",
+    meaning: "「半月のポーズ」。片足で立ちながら体を横に倒し、半月の形を作ります。集中力とバランス感覚を高める挑戦的なポーズです。" },
+  { sanskrit: "Utkāṭāsana", ja: "ウトゥカタアーサナ", cat: "ポーズ",
+    meaning: "「椅子のポーズ」。見えない椅子に座るように腰を落として両腕を上げます。太もも・体幹を鍛え、持久力と熱を生み出します。" },
+  { sanskrit: "Halāsana", ja: "ハーラーサナ", cat: "ポーズ",
+    meaning: "「鋤のポーズ」。仰向けから脚を頭の後ろに下ろします。脊柱全体を深くストレッチし、神経系を穏やかに鎮めます。" },
+  { sanskrit: "Śīrṣāsana", ja: "シールシャーサナ", cat: "ポーズ",
+    meaning: "「頭立ちのポーズ」。ヨガの王とも呼ばれる逆転ポーズです。血流を促し、集中力と自信を高めます。" },
+  { sanskrit: "Matsyāsana", ja: "マッチャーサナ", cat: "ポーズ",
+    meaning: "「魚のポーズ」。仰向けで胸を大きく開き後頭部を床につけます。喉と胸を開いてプラーナの流れを活性化させます。" },
+  { sanskrit: "Gomukāsana", ja: "ゴームカーサナ", cat: "ポーズ",
+    meaning: "「牛の顔のポーズ」。脚を交差させ両手を背中で組みます。股関節・肩・胸を同時に開き、体全体のバランスを整えます。" },
+  { sanskrit: "Parivṛtta Trikoṇāsana", ja: "パリヴリッタトリコナーサナ", cat: "ポーズ",
+    meaning: "「回転した三角のポーズ」。三角のポーズを捻った変化形です。消化器官を刺激し、体幹の深部を強化します。" },
+
+  // 呼吸・エネルギー（追加）
+  { sanskrit: "Nāḍī Śodhana", ja: "ナーディショーダナ", cat: "呼吸・エネルギー",
+    meaning: "「経路の浄化」という意味の交互鼻孔呼吸法です。左右の鼻孔を交互に使うことで、体内のエネルギーバランスを整えます。" },
+  { sanskrit: "Kapālabhāti", ja: "カパーラバーティ", cat: "呼吸・エネルギー",
+    meaning: "「頭蓋骨を輝かせる」という意味の呼吸法。腹部を素早く収縮させる力強い呼吸で、体内を浄化しエネルギーを活性化します。" },
+  { sanskrit: "Chakra", ja: "チャクラ", cat: "呼吸・エネルギー",
+    meaning: "「車輪・渦」を意味するエネルギーセンター。体内に7つのチャクラがあるとされ、それぞれ異なる身体機能・感情・意識と関連しています。" },
+  { sanskrit: "Kuṇḍalinī", ja: "クンダリニー", cat: "呼吸・エネルギー",
+    meaning: "脊柱の根本に眠る「蛇のように巻いたエネルギー」。ヨガの実践を通じて目覚め、チャクラを通って上昇すると考えられています。" },
+  { sanskrit: "Śītalī", ja: "シータリー", cat: "呼吸・エネルギー",
+    meaning: "「冷却の呼吸」。舌を丸めて管のように口から息を吸い込む呼吸法です。体を冷やし、怒りや興奮を鎮める効果があります。" },
+
+  // 哲学・心（追加）
+  { sanskrit: "Yama", ja: "ヤマ", cat: "哲学・心",
+    meaning: "ヨガの8支則の最初の支。社会的な倫理・行動規範を指し、アヒンサー（非暴力）、サティヤ（真実）などの5つの規律を含みます。" },
+  { sanskrit: "Niyama", ja: "ニヤマ", cat: "哲学・心",
+    meaning: "8支則の第2支。個人の修行・自己規律に関する規範で、清潔（シャウチャ）、満足（サントーシャ）などの5つの実践からなります。" },
+  { sanskrit: "Satya", ja: "サティヤ", cat: "哲学・心",
+    meaning: "「真実・誠実さ」を意味するヤマのひとつ。言葉・思考・行動において正直であり続けることで、内外の調和が生まれます。" },
+  { sanskrit: "Santoṣa", ja: "サントーシャ", cat: "哲学・心",
+    meaning: "「知足・満足」を意味するニヤマのひとつ。今あるものに感謝し、足るを知ることで、内側から湧き出る幸福感を育みます。" },
+  { sanskrit: "Svādhyāya", ja: "スヴァーディヤーヤ", cat: "哲学・心",
+    meaning: "「自己学習・内省」を意味します。聖典の学びや自己観察を通じて、自分の本質をより深く理解していく実践です。" },
+  { sanskrit: "Tapas", ja: "タパス", cat: "哲学・心",
+    meaning: "「熱・情熱・鍛錬」を意味します。規律ある練習を継続することで生まれる内なる熱が、不純物を燃やし変容をもたらすとされます。" },
+  { sanskrit: "Īśvara Praṇidhāna", ja: "イーシュヴァラプラニダーナ", cat: "哲学・心",
+    meaning: "「神・宇宙への明け渡し」。エゴを手放し、より大きな力や宇宙の意志に信頼して委ねるという姿勢を表します。" },
+  { sanskrit: "Vairāgya", ja: "ヴァイラーギャ", cat: "哲学・心",
+    meaning: "「離欲・執着からの自由」。結果や物事に執着せず、淡々と実践を続けることで得られる内的な自由の状態を指します。" },
+  { sanskrit: "Karma", ja: "カルマ", cat: "哲学・心",
+    meaning: "「行為とその結果」を意味します。すべての行為は原因と結果の法則に従い、思考・言葉・行動が未来を形作るという考え方です。" },
+  { sanskrit: "Māyā", ja: "マーヤー", cat: "哲学・心",
+    meaning: "「幻・錯覚」を意味します。私たちが現実だと思っている世界は幻想に過ぎず、真の現実は純粋意識（ブラフマン）だとする考え方です。" },
+  { sanskrit: "Ātman", ja: "アートマン", cat: "哲学・心",
+    meaning: "「個人の魂・真我」を意味します。肉体や思考を超えた永遠不変の本質的自己のことで、宇宙の根本原理（ブラフマン）と同一とされます。" },
+  { sanskrit: "Brahman", ja: "ブラフマン", cat: "哲学・心",
+    meaning: "「宇宙の根本原理・絶対者」を意味します。すべての存在の根底にある普遍的意識であり、アートマン（個我）はブラフマンと本質的に同一とされます。" },
+];
+
+let filtered = [...words];
+let currentIdx = 0;
+let currentCat = 'すべて';
+let favourites = JSON.parse(localStorage.getItem('yoga-favs') || '[]');
+
+function setFilter(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtered = cat === 'すべて' ? [...words] : words.filter(w => w.cat === cat);
+  currentIdx = 0;
+  showWord(false);
+}
+
+function showWord(animate = true) {
+  const w = filtered[currentIdx];
+  if (!w) return;
+
+  const els = ['sanskrit','word','meaning','tag'];
+  if (animate) els.forEach(id => document.getElementById(id).classList.add('fade-out'));
+
+  setTimeout(() => {
+    document.getElementById('tag').textContent = w.cat;
+    document.getElementById('sanskrit').textContent = w.sanskrit;
+    document.getElementById('word').textContent = w.ja;
+    document.getElementById('meaning').textContent = w.meaning;
+    document.getElementById('count-label').textContent = `${currentIdx + 1} / ${filtered.length}`;
+
+    // dots (max 8)
+    const dotsEl = document.getElementById('dots');
+    dotsEl.innerHTML = '';
+    const show = Math.min(filtered.length, 8);
+    const dotIdx = Math.floor(currentIdx / filtered.length * show);
+    for (let i = 0; i < show; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i === dotIdx ? ' active' : '');
+      dotsEl.appendChild(d);
+    }
+
+    // fav button
+    const isFav = favourites.includes(w.ja);
+    const favBtn = document.getElementById('fav-btn');
+    favBtn.textContent = isFav ? '★' : '☆';
+    favBtn.classList.toggle('starred', isFav);
+
+    if (animate) els.forEach(id => document.getElementById(id).classList.remove('fade-out'));
+  }, animate ? 320 : 0);
+}
+
+function nextWord() {
+  currentIdx = (currentIdx + 1) % filtered.length;
+  showWord(true);
+}
+
+function toggleFav() {
+  const w = filtered[currentIdx];
+  const idx = favourites.indexOf(w.ja);
+  if (idx >= 0) favourites.splice(idx, 1);
+  else favourites.push(w.ja);
+  localStorage.setItem('yoga-favs', JSON.stringify(favourites));
+  renderFavList();
+  showWord(false);
+}
+
+function renderFavList() {
+  const el = document.getElementById('fav-list');
+  if (favourites.length === 0) {
+    el.innerHTML = '<span class="fav-empty">まだありません</span>';
+    return;
+  }
+  el.innerHTML = favourites.map(f => {
+    const w = words.find(x => x.ja === f);
+    return `<div class="fav-item">🌿 <strong>${f}</strong>　<span style="color:#8aaa7a;font-size:0.8rem">${w ? w.sanskrit : ''}</span></div>`;
+  }).join('');
+}
+
+function toggleFavPanel() {
+  document.getElementById('fav-list').classList.toggle('open');
+}
+
+// ambient leaves
+const leafEmojis = ['🌿','🍃','🌱','✨','🌸','🍀'];
+function spawnLeaf() {
+  const l = document.createElement('div');
+  l.className = 'leaf';
+  l.textContent = leafEmojis[Math.floor(Math.random() * leafEmojis.length)];
+  l.style.left = (Math.random() * 100) + 'vw';
+  l.style.animationDuration = (10 + Math.random() * 12) + 's';
+  l.style.fontSize = (0.8 + Math.random() * 0.8) + 'rem';
+  document.getElementById('leaves').appendChild(l);
+  setTimeout(() => l.remove(), 24000);
+}
+setInterval(spawnLeaf, 2000);
+
+// init
+showWord(false);
+renderFavList();
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
+</script>
+</body>
+</html>

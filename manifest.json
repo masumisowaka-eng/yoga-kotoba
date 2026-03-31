@@ -1,0 +1,14 @@
+{
+  "name": "ヨガの言葉",
+  "short_name": "ヨガの言葉",
+  "description": "ヨガの用語とその意味を一語ずつ学ぼう",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#d4e8d4",
+  "theme_color": "#7aad8c",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
